@@ -112,6 +112,8 @@ import modules.vectorization.VectorMedianCalculatorModule;
 import modules.vectorization.suffixTreeVectorizationWrapper.SuffixTreeVectorizationWrapperController;
 import modules.visualization.ASCIIGraph;
 import modules.visualization.ColourGraph;
+import modules.weka_classifier.ResolveClassificationModule;
+import modules.weka_classifier.WekaClassifierWrapperModule;
 
 public class ModuleWorkbenchController{ // TODO anderer Listener
 	
@@ -227,6 +229,8 @@ public class ModuleWorkbenchController{ // TODO anderer Listener
 		createAndRegisterModule(MorphologyCheckModule.class);
 		createAndRegisterModule(MatrixValuesExpressionApplyModule.class);
 		createAndRegisterModule(MatrixOperations.class);
+		createAndRegisterModule(WekaClassifierWrapperModule.class);
+		createAndRegisterModule(ResolveClassificationModule.class);
 	}
 	
 	/**
