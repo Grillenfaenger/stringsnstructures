@@ -1,8 +1,14 @@
 package modules.weka_classifier;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -18,11 +24,14 @@ import modules.InputPort;
 import modules.ModuleImpl;
 import modules.OutputPort;
 import common.parallelization.CallbackReceiver;
+import de.uni_koeln.spinfo.stocknews.articles.processing.RicProcessing;
+import de.uni_koeln.spinfo.stocknews.evaluation.data.TrainingDataCollection;
+import de.uni_koeln.spinfo.stocknews.stocks.data.Trend;
 
 public class ResolveClassificationModule extends ModuleImpl {
 	
 	// Define property keys (every setting has to have a unique key to associate it with)
-	public static final String PROPERTYKEY_CLASSES_DEF = "classes definition";
+	public static final String PROPERTYKEY_TRAININGDATA = "training data";
 //	public static final String PROPERTYKEY_DELIMITER_B = "delimiter B";
 //	public static final String PROPERTYKEY_DELIMITER_OUTPUT = "delimiter out";
 	
@@ -34,9 +43,13 @@ public class ResolveClassificationModule extends ModuleImpl {
 	
 	private final static Type INPUT_CLASSIFICATION_TYPE = new TypeToken<TreeMap<Integer, Integer>>() {
 	}.getType();
+	private final static Type OUTPUT_TYPE = new TypeToken<List<PrettyResult>>() {
+	}.getType();
 	
 	// Local variables
-	private String classDefinition;
+	private String trainingdataFilepath;
+	private Map<Integer, Trend> classDefinition;
+	private List<String> coveredRics;
 //	private String inputdelimiter_b;
 //	private String outputdelimiter;
 
@@ -62,12 +75,12 @@ public class ResolveClassificationModule extends ModuleImpl {
 //		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Example Module");
 
 		// Add property descriptions (obligatory for every property!)
-		this.getPropertyDescriptions().put(PROPERTYKEY_CLASSES_DEF, "Path to class definition file");
+		this.getPropertyDescriptions().put(PROPERTYKEY_TRAININGDATA, "Path to training data file containing class definition metadata");
 
 		
 		// Add property defaults (_should_ be provided for every property)
 		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Resolve Classification Module");
-		this.getPropertyDefaultValues().put(PROPERTYKEY_CLASSES_DEF, "C:/Users/avogt/git/SNC/StockNewsClassification/output/classification/trainingDataTEST_classes.txt");
+		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATA, "C:/Users/avogt/git/SNC/StockNewsClassification/output/classification/trainingDataTEST2.json");
 
 		
 		// Define I/O
@@ -103,16 +116,26 @@ public class ResolveClassificationModule extends ModuleImpl {
 		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		final TreeMap<Integer, Integer> classified = gson.fromJson(classifiedString, INPUT_CLASSIFICATION_TYPE);
 	
-		for(int key : classified.keySet()){
-			// TODO	Programmlogik
-//			sentences[key];
+		try (Reader reader = new FileReader(trainingdataFilepath)) {
+
+			// Convert JSON to Java Object
+			 
+			TrainingDataCollection tdColl = gson.fromJson(reader, TrainingDataCollection.class);
+			this.classDefinition = invert(tdColl.getClasses());
+			this.coveredRics = tdColl.getCoveredRics();
 		}
-		
+		List<PrettyResult> results = new ArrayList<PrettyResult>();
+		for(int key : classified.keySet()){
+			List<String> extractedTags = RicProcessing.extractTags(sentences[key]);
+			PrettyResult res = new PrettyResult(key,extractedTags,classDefinition.get(classified.get(key)),sentences[key]);
+			System.out.println(res);
+			results.add(res);
+		}
+		final String jsonOut = gson.toJson(results, OUTPUT_TYPE);
+		this.getOutputPorts().get(ID_OUTPUT).outputToAllCharPipes(jsonOut);
 		
 		// Close outputs (important!)
 		this.closeAllOutputs();
-		
-		
 		
 		// Done
 		return true;
@@ -125,10 +148,44 @@ public class ResolveClassificationModule extends ModuleImpl {
 		super.setDefaultsIfMissing();
 		
 		// Apply own properties
-		this.classDefinition = this.getProperties().getProperty(PROPERTYKEY_CLASSES_DEF, this.getPropertyDefaultValues().get(PROPERTYKEY_CLASSES_DEF));
+		trainingdataFilepath = this.getProperties().getProperty(PROPERTYKEY_TRAININGDATA, this.getPropertyDefaultValues().get(PROPERTYKEY_TRAININGDATA));
 		
 		// Apply parent object's properties (just the name variable actually)
 		super.applyProperties();
+	}
+	
+	private <V, K> Map<V, K> invert(Map<K, V> map) {
+
+	    Map<V, K> inv = new HashMap<V, K>();
+
+	    for (Entry<K, V> entry : map.entrySet())
+	        inv.put(entry.getValue(), entry.getKey());
+
+	    return inv;
+	}
+
+	class PrettyResult{
+		
+		int id;
+		List<String> rics;
+		Trend trend;
+		String content;
+		
+		public PrettyResult(int id, List<String> rics, Trend trend, String content) {
+			super();
+			this.id = id;
+			this.rics = rics;
+			this.trend = trend;
+			this.content = content;
+		}
+
+		@Override
+		public String toString() {
+			return "Result [id=" + id + ", rics=" + rics + ", trend=" + trend
+					+ ", content=" + content + "]";
+		}
+		
+		
 	}
 
 }

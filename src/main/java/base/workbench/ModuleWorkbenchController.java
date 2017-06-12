@@ -113,6 +113,7 @@ import modules.vectorization.suffixTreeVectorizationWrapper.SuffixTreeVectorizat
 import modules.visualization.ASCIIGraph;
 import modules.visualization.ColourGraph;
 import modules.weka_classifier.ResolveClassificationModule;
+import modules.weka_classifier.ReutersNewsXLSInputModule;
 import modules.weka_classifier.WekaClassifierWrapperModule;
 
 public class ModuleWorkbenchController{ // TODO anderer Listener
@@ -231,6 +232,7 @@ public class ModuleWorkbenchController{ // TODO anderer Listener
 		createAndRegisterModule(MatrixOperations.class);
 		createAndRegisterModule(WekaClassifierWrapperModule.class);
 		createAndRegisterModule(ResolveClassificationModule.class);
+		createAndRegisterModule(ReutersNewsXLSInputModule.class);
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package modules.weka_classifier;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -23,6 +24,9 @@ import modules.OutputPort;
 
 
 
+
+
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.google.gson.Gson;
@@ -32,6 +36,7 @@ import com.google.gson.reflect.TypeToken;
 import common.parallelization.CallbackReceiver;
 import de.uni_koeln.spinfo.classification.core.data.ClassifyUnit;
 import de.uni_koeln.spinfo.classification.zoneAnalysis.data.ZoneClassifyUnit;
+import de.uni_koeln.spinfo.stocknews.articles.data.Article;
 import de.uni_koeln.spinfo.stocknews.classification.workflow.WekaClassifier;
 import base.workbench.ModuleRunner;
 
@@ -45,14 +50,18 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 	// Strings identifying/describing in- and output pipes
 	
 	private final static String INPUT_ID = "json";
+	private final static String INPUT_ARTICLES_ID = "article objects in json";
 	private final static String OUTPUT_ID = "json";
 	private final static String INPUT_DESC = "[text/json] TreeMap<Integer,TreeMap<String,Integer>>";
+	private final static String INPUT_ARTICLES_DESC = "[text/json] List<Article>";
 	private final static String OUTPUT_DESC = "[text/json] TreeMap<Integer,ZoneClassifyUnit>";	
 	
 	private final static String OUTPUT_SIMPLE_ID = "json";
 	private final static String OUTPUT_SIMPLE_DESC = "[text/json] Bags of Words (class: TreeMap&lt;Integer,Integer&gt;)";
 		
 	private final static Type INPUT_TYPE = new TypeToken<TreeMap<Integer, TreeMap<String, Integer>>>() {
+	}.getType();
+	private final static Type INPUT_ARTICLE_TYPE = new TypeToken<TreeMap<Integer, TreeMap<String, Integer>>>() {
 	}.getType();
 	private final static Type OUTPUT_SIMPLE_TYPE = new TypeToken<TreeMap<Integer, Integer>>() {
 	}.getType();
@@ -93,13 +102,16 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 		//this.getPropertyDefaultValues().put(PROPERTYKEY_UNESCAPE, "true");
 		
 		// Define I/O
-		InputPort inputPort = new InputPort(INPUT_ID, "Plain text character input.", this);
-		inputPort.addSupportedPipe(CharPipe.class);
+		InputPort bowPort = new InputPort(INPUT_ID, "bag of words input.", this);
+		bowPort.addSupportedPipe(CharPipe.class);
+		InputPort articlePort = new InputPort(INPUT_ARTICLES_ID, "json article objects.", this);
+		articlePort.addSupportedPipe(CharPipe.class);
 		OutputPort outputPort = new OutputPort(OUTPUT_ID, "Plain text character output.", this);
 		outputPort.addSupportedPipe(CharPipe.class);
 		
 		// Add I/O ports to instance (don't forget...)
-		super.addInputPort(inputPort);
+		super.addInputPort(bowPort);
+		super.addInputPort(articlePort);
 		super.addOutputPort(outputPort);
 		
 	}
@@ -107,32 +119,52 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 	@Override
 	public boolean process() throws Exception {
 		
-		final String input = this.readStringFromInputPort(this.getInputPorts().get(INPUT_ID));
-
+		TreeMap<Integer,Integer> result = new TreeMap<Integer,Integer>();
+		
+		// A Gson object to serialize and deserialize with
+		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		final InputPort bowPort = this.getInputPorts().get(INPUT_ID);
+		final InputPort articlePort = this.getInputPorts().get(INPUT_ARTICLES_ID);
+		
 		// the output: an empty result map mapping sentence Nrs to a map holding
 		// the distance of this sentence to each other sentence
 		
-		
-		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		final TreeMap<Integer, Map<String, Integer>> sentenceNrsToBagOfWords = gson.fromJson(input, INPUT_TYPE);
-		final Set<Integer> sentenceNrs = sentenceNrsToBagOfWords.keySet();
+		if (bowPort.isConnected() && articlePort.isConnected()) {
+			throw new Exception("Either simple input or article input has to be connected, not both.");
+		} else if (bowPort.isConnected()) {
+			final String bow_input = this.readStringFromInputPort(this.getInputPorts().get(INPUT_ID));
+			final TreeMap<Integer, Map<String, Integer>> sentenceNrsToBagOfWords = gson.fromJson(bow_input, INPUT_TYPE);
+			final Set<Integer> sentenceNrs = sentenceNrsToBagOfWords.keySet();
 
-		System.out.println(sentenceNrsToBagOfWords);
-		// make sure that the bags of words are ready to use
-		if (sentenceNrs.size() == 0) {
-			throw new Exception("No bags of words given");
+			System.out.println(sentenceNrsToBagOfWords);
+			// make sure that the bags of words are ready to use
+			if (sentenceNrs.size() == 0) {
+				throw new Exception("No bags of words given");
+			}
+			
+			// main functionality
+			WekaClassifier classifier = new WekaClassifier(sentenceNrsToBagOfWords, new File(trainingdatafile), classifiermethod);
+			TreeMap<Integer, ZoneClassifyUnit> classified = classifier.classify();
+			
+			HashMap<Integer,Integer> resultH = new HashMap<Integer,Integer>();
+			for(Integer key : classified.keySet()){
+				resultH.put(key, classified.get(key).getActualClassID());
+			}
+			
+			result.putAll(resultH);
+		} else if (articlePort.isConnected()){
+			final String article_input = this.readStringFromInputPort(this.getInputPorts().get(INPUT_ARTICLES_ID));
+			final List<Article> articles = gson.fromJson(article_input, INPUT_ARTICLE_TYPE);
+			
+			//TODO
+			/*hier weiter:
+			 * Etwas anderer Classifier, bzw. anderer Konstruktor
+			 *
+			 */
+		
 		}
 		
-		// main functionality
-		WekaClassifier classifier = new WekaClassifier(sentenceNrsToBagOfWords, new File(trainingdatafile), classifiermethod);
-		TreeMap<Integer, ZoneClassifyUnit> classified = classifier.classify();
-		
-		HashMap<Integer,Integer> resultH = new HashMap<Integer,Integer>();
-		for(Integer key : classified.keySet()){
-			resultH.put(key, classified.get(key).getActualClassID());
-		}
-		TreeMap<Integer,Integer> result = new TreeMap<Integer,Integer>();
-		result.putAll(resultH);
 		
 		// serialize the classification result to json and flush it to the output
 		// ports
