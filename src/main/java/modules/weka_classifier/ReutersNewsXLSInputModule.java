@@ -38,7 +38,7 @@ public class ReutersNewsXLSInputModule extends ModuleImpl {
 	// Define I/O IDs (must be unique for every input or output)
 	private static final String ID_OUTPUT = "output";
 	
-	private final static Type OUTPUT_TYPE = new TypeToken<List<Article>>() {
+	private final static Type OUTPUT_TYPE = new TypeToken<Map<Integer,String>>() {
 	}.getType();
 	
 	// Local variables
@@ -83,7 +83,7 @@ public class ReutersNewsXLSInputModule extends ModuleImpl {
 		 * in contrast only obtain data from one pipe instance.
 		 */
 		
-		OutputPort outputPort = new OutputPort(ID_OUTPUT, "json serialized list of articles", this);
+		OutputPort outputPort = new OutputPort(ID_OUTPUT, "json serialized map of article contents", this);
 		outputPort.addSupportedPipe(CharPipe.class);
 		
 		// Add I/O ports to instance (don't forget...)
@@ -95,8 +95,20 @@ public class ReutersNewsXLSInputModule extends ModuleImpl {
 		
 		List<Article> articles = XLSReader.getArticlesFromXlsFile(xlsFilePath);
 		
+		Map<Integer,String> articleContents = new TreeMap<Integer,String>();
+		Map<Integer,String> articleContentsH = new HashMap<Integer,String>();
+		for (int i = 0; i < articles.size(); i++) {
+			Article art = articles.get(i);
+			if(!(art.getTitle().trim().isEmpty() && art.getContent().trim().isEmpty())){
+				articleContentsH.put(i, articles.get(i).getTitle() + " " + articles.get(i).getContent());	
+			} else {
+				System.out.println("No content in article Nr " + i + ": " + art.printComplete());
+			}
+		}
+		articleContents.putAll(articleContentsH);
+		
 		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		final String jsonOut = gson.toJson(articles, OUTPUT_TYPE);
+		final String jsonOut = gson.toJson(articleContents, OUTPUT_TYPE);
 		this.getOutputPorts().get(ID_OUTPUT).outputToAllCharPipes(jsonOut);
 		
 		// Close outputs (important!)

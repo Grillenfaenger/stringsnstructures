@@ -24,6 +24,7 @@ import modules.InputPort;
 import modules.ModuleImpl;
 import modules.OutputPort;
 import common.parallelization.CallbackReceiver;
+import de.uni_koeln.spinfo.stocknews.articles.data.Article;
 import de.uni_koeln.spinfo.stocknews.articles.processing.RicProcessing;
 import de.uni_koeln.spinfo.stocknews.evaluation.data.TrainingDataCollection;
 import de.uni_koeln.spinfo.stocknews.stocks.data.Trend;
@@ -32,16 +33,16 @@ public class ResolveClassificationModule extends ModuleImpl {
 	
 	// Define property keys (every setting has to have a unique key to associate it with)
 	public static final String PROPERTYKEY_TRAININGDATA = "training data";
-//	public static final String PROPERTYKEY_DELIMITER_B = "delimiter B";
-//	public static final String PROPERTYKEY_DELIMITER_OUTPUT = "delimiter out";
 	
 	// Define I/O IDs (must be unique for every input or output)
-	private static final String ID_INPUT_CLASSIFICATON = "Result of the WekaClassifier Wrapper";
-	private static final String ID_INPUT_TEXT = "initial input file of the Classification";
+	private static final String ID_INPUT_CLASSIFICATON = "Result of WekaClassifier Wrapper module";
+	private static final String ID_INPUT_TEXT = "text input";
+	private static final String ID_INPUT_ARTICLES = "articles";
 	private static final String ID_OUTPUT = "output";
-//	private static final String ID_OUTPUT_ENTWINED_CAPITALISED = "capitals";
 	
 	private final static Type INPUT_CLASSIFICATION_TYPE = new TypeToken<TreeMap<Integer, Integer>>() {
+	}.getType();
+	private final static Type INPUT_ARTICLE_TYPE = new TypeToken<TreeMap<Integer,String>>() {
 	}.getType();
 	private final static Type OUTPUT_TYPE = new TypeToken<List<PrettyResult>>() {
 	}.getType();
@@ -50,13 +51,6 @@ public class ResolveClassificationModule extends ModuleImpl {
 	private String trainingdataFilepath;
 	private Map<Integer, Trend> classDefinition;
 	private List<String> coveredRics;
-//	private String inputdelimiter_b;
-//	private String outputdelimiter;
-
-//	// Main method for stand-alone execution
-//	public static void main(String[] args) throws Exception {
-//		ModuleRunner.runStandAlone(ResolveClassificationModule.class, args);
-//	}
 	
 	public ResolveClassificationModule(CallbackReceiver callbackReceiver,
 			Properties properties) throws Exception {
@@ -72,14 +66,13 @@ public class ResolveClassificationModule extends ModuleImpl {
 
 		// the module's name is defined as a property
 		// Property key for module name is defined in parent class
-//		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Example Module");
+		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Resolve Classification Module");
 
 		// Add property descriptions (obligatory for every property!)
 		this.getPropertyDescriptions().put(PROPERTYKEY_TRAININGDATA, "Path to training data file containing class definition metadata");
 
 		
 		// Add property defaults (_should_ be provided for every property)
-		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Resolve Classification Module");
 		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATA, "C:/Users/avogt/git/SNC/StockNewsClassification/output/classification/trainingDataTEST2.json");
 
 		
@@ -91,29 +84,54 @@ public class ResolveClassificationModule extends ModuleImpl {
 		 * to multiple pipe instances at once, input ports can
 		 * in contrast only obtain data from one pipe instance.
 		 */
-		InputPort inputPort1 = new InputPort(ID_INPUT_CLASSIFICATON, "Result of WekaClassifier Wrapper.", this);
-		inputPort1.addSupportedPipe(CharPipe.class);
-		InputPort inputPort2 = new InputPort(ID_INPUT_TEXT, "Plain text character input.", this);
-		inputPort2.addSupportedPipe(CharPipe.class);
+		InputPort classificationPort = new InputPort(ID_INPUT_CLASSIFICATON, "Result of WekaClassifier Wrapper.", this);
+		classificationPort.addSupportedPipe(CharPipe.class);
+		InputPort textPort = new InputPort(ID_INPUT_TEXT, "Plain text character input.", this);
+		textPort.addSupportedPipe(CharPipe.class);
+		InputPort articlePort = new InputPort(ID_INPUT_ARTICLES, "json article objects.", this);
+		articlePort.addSupportedPipe(CharPipe.class);
 		OutputPort outputPort = new OutputPort(ID_OUTPUT, "Plain text character output.", this);
 		outputPort.addSupportedPipe(CharPipe.class);
 		
 		// Add I/O ports to instance (don't forget...)
-		super.addInputPort(inputPort1);
-		super.addInputPort(inputPort2);
+		super.addInputPort(classificationPort);
+		super.addInputPort(textPort);
+		super.addInputPort(articlePort);
 		super.addOutputPort(outputPort);
-//		super.addOutputPort(capsOutputPort);
 		
 	}
 
 	@Override
 	public boolean process() throws Exception {
 		
-		final String text = this.readStringFromInputPort(this.getInputPorts().get(ID_INPUT_TEXT));
-		final String[] sentences = Pattern.compile("\r\n|\n|\r").split(text);
+		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		final InputPort textPort = this.getInputPorts().get(ID_INPUT_TEXT);
+		final InputPort articlesPort = this.getInputPorts().get(ID_INPUT_ARTICLES);
+		TreeMap<Integer,String> articles = new TreeMap<Integer,String>();
+
+		if (textPort.isConnected() && articlesPort.isConnected()) {
+			throw new Exception("Either text input or article input has to be connected, not both..");
+		} else if (textPort.isConnected()){
+			final String text = this.readStringFromInputPort(this.getInputPorts().get(ID_INPUT_TEXT));
+			final String[] sentencesBuff = Pattern.compile("\r\n|\n|\r").split(text);
+			
+			for (int i = 0; i < sentencesBuff.length; i++) {
+				articles.put(i, sentencesBuff[i]);
+			}
+		} else if (articlesPort.isConnected()){
+			final String article_input = this.readStringFromInputPort(this.getInputPorts().get(ID_INPUT_ARTICLES));
+			articles = gson.fromJson(article_input, INPUT_ARTICLE_TYPE);
+			
+//			String[] sentencesBuff = new String[articles.size()];
+//			for (Integer i = 0; i < articles.size(); i++) {
+//				sentencesBuff[i] = articles.get(i).getTitle() + " " + articles.get(i).getContent();
+//			}
+//			sentences = sentencesBuff;
+			//TODO
+		}
 		
 		final String classifiedString = this.readStringFromInputPort(this.getInputPorts().get(ID_INPUT_CLASSIFICATON));
-		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		final TreeMap<Integer, Integer> classified = gson.fromJson(classifiedString, INPUT_CLASSIFICATION_TYPE);
 	
 		try (Reader reader = new FileReader(trainingdataFilepath)) {
@@ -126,8 +144,8 @@ public class ResolveClassificationModule extends ModuleImpl {
 		}
 		List<PrettyResult> results = new ArrayList<PrettyResult>();
 		for(int key : classified.keySet()){
-			List<String> extractedTags = RicProcessing.extractTags(sentences[key]);
-			PrettyResult res = new PrettyResult(key,extractedTags,classDefinition.get(classified.get(key)),sentences[key]);
+			List<String> extractedTags = RicProcessing.extractTags(articles.get(key));
+			PrettyResult res = new PrettyResult(key,extractedTags,classDefinition.get(classified.get(key)),articles.get(key));
 			System.out.println(res);
 			results.add(res);
 		}
