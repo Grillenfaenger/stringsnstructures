@@ -193,6 +193,8 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 				resultH.put(key, classified.get(key).getActualClassID());
 			}
 			result.putAll(resultH);
+			
+			System.out.println(result.get(6297));
 		}
 		
 		

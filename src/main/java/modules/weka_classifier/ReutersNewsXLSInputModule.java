@@ -99,9 +99,8 @@ public class ReutersNewsXLSInputModule extends ModuleImpl {
 		Map<Integer,String> articleContentsH = new HashMap<Integer,String>();
 		for (int i = 0; i < articles.size(); i++) {
 			Article art = articles.get(i);
-			if(!(art.getTitle().trim().isEmpty() && art.getContent().trim().isEmpty())){
-				articleContentsH.put(i, articles.get(i).getTitle() + " " + articles.get(i).getContent());	
-			} else {
+			articleContentsH.put(i, articles.get(i).getTitle() + " " + articles.get(i).getContent());	
+			if((art.getTitle().trim().isEmpty() && art.getContent().trim().isEmpty())){
 				System.out.println("No content in article Nr " + i + ": " + art.printComplete());
 			}
 		}

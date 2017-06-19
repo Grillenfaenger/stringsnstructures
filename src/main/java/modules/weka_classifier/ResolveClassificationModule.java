@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
@@ -24,6 +26,7 @@ import modules.InputPort;
 import modules.ModuleImpl;
 import modules.OutputPort;
 import common.parallelization.CallbackReceiver;
+import de.uni_koeln.spinfo.classification.core.featureEngineering.FeatureUnitTokenizer;
 import de.uni_koeln.spinfo.stocknews.articles.data.Article;
 import de.uni_koeln.spinfo.stocknews.articles.processing.RicProcessing;
 import de.uni_koeln.spinfo.stocknews.evaluation.data.TrainingDataCollection;
@@ -50,7 +53,7 @@ public class ResolveClassificationModule extends ModuleImpl {
 	// Local variables
 	private String trainingdataFilepath;
 	private Map<Integer, Trend> classDefinition;
-	private List<String> coveredRics;
+	private Set<String> coveredRics;
 	
 	public ResolveClassificationModule(CallbackReceiver callbackReceiver,
 			Properties properties) throws Exception {
@@ -144,11 +147,15 @@ public class ResolveClassificationModule extends ModuleImpl {
 		}
 		List<PrettyResult> results = new ArrayList<PrettyResult>();
 		for(int key : classified.keySet()){
-			List<String> extractedTags = RicProcessing.extractTags(articles.get(key));
+			Set<String> extractedTags = RicProcessing.extractTags(articles.get(key));
+//			extractedTags.addAll(findRics(articles.get(key)));
+//			Set<String> extractedTags = (findRics(articles.get(key)));
 			PrettyResult res = new PrettyResult(key,extractedTags,classDefinition.get(classified.get(key)),articles.get(key));
 			System.out.println(res);
 			results.add(res);
 		}
+		
+		System.out.println(results.get(6297));
 		final String jsonOut = gson.toJson(results, OUTPUT_TYPE);
 		this.getOutputPorts().get(ID_OUTPUT).outputToAllCharPipes(jsonOut);
 		
@@ -181,15 +188,29 @@ public class ResolveClassificationModule extends ModuleImpl {
 
 	    return inv;
 	}
+	
+	private Set<String> findRics(String text){
+		Set<String> rics = new TreeSet<String>();
+		// Tokenize
+		FeatureUnitTokenizer tokenizer = new FeatureUnitTokenizer();
+		List<String> tokens = tokenizer.tokenize(text);
+		// match
+		for(String ric : coveredRics){
+			if(tokens.contains(ric)){
+				rics.add(ric);
+			}
+		}
+		return rics;
+	}
 
 	class PrettyResult{
 		
 		int id;
-		List<String> rics;
+		Set<String> rics;
 		Trend trend;
 		String content;
 		
-		public PrettyResult(int id, List<String> rics, Trend trend, String content) {
+		public PrettyResult(int id, Set<String> rics, Trend trend, String content) {
 			super();
 			this.id = id;
 			this.rics = rics;
