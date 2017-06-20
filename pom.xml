@@ -59,21 +59,16 @@
 				</executions>
 			</plugin>
 			<plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>2.7</version>
-          <dependencies>
-            <dependency>
-                <groupId>org.apache.maven.shared</groupId>
-                <artifactId>maven-filtering</artifactId>
-                <version>1.3</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.7</version>
+				 <dependencies>
+            		<dependency>
+                		<groupId>org.apache.maven.shared</groupId>
+               			<artifactId>maven-filtering</artifactId>
+                		<version>1.3</version>
+            		</dependency>
+          		</dependencies>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -192,7 +187,7 @@
 	  		<artifactId>StockNewsClassification</artifactId>
 	  		<version>0.0.1-SNAPSHOT</version>
     		<scope>system</scope>
-    		<systemPath>${project.basedir}/src/main/resources/StockNewsClassification.jar</systemPath>
+    		<systemPath>${project.basedir}/src/main/resources/StockNewsClassification-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

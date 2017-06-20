@@ -1,34 +1,21 @@
 package modules.weka_classifier;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import base.workbench.ModuleRunner;
 import modules.CharPipe;
-import modules.InputPort;
 import modules.ModuleImpl;
 import modules.OutputPort;
 import common.parallelization.CallbackReceiver;
 import de.uni_koeln.spinfo.stocknews.articles.data.Article;
 import de.uni_koeln.spinfo.stocknews.articles.io.XLSReader;
-import de.uni_koeln.spinfo.stocknews.articles.processing.RicProcessing;
-import de.uni_koeln.spinfo.stocknews.evaluation.data.TrainingDataCollection;
-import de.uni_koeln.spinfo.stocknews.stocks.data.Trend;
 
 public class ReutersNewsXLSInputModule extends ModuleImpl {
 	
