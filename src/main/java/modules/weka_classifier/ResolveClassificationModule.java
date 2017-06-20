@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
@@ -34,8 +35,11 @@ import de.uni_koeln.spinfo.stocknews.stocks.data.Trend;
 
 public class ResolveClassificationModule extends ModuleImpl {
 	
+	public static final Pattern ricPattern = Pattern.compile("[A-Z]{1,4}\\.[A-Z]{1,2}");
+	
 	// Define property keys (every setting has to have a unique key to associate it with)
 	public static final String PROPERTYKEY_TRAININGDATA = "training data";
+	
 	
 	// Define I/O IDs (must be unique for every input or output)
 	private static final String ID_INPUT_CLASSIFICATON = "Result of WekaClassifier Wrapper module";
@@ -148,8 +152,7 @@ public class ResolveClassificationModule extends ModuleImpl {
 		List<PrettyResult> results = new ArrayList<PrettyResult>();
 		for(int key : classified.keySet()){
 			Set<String> extractedTags = RicProcessing.extractTags(articles.get(key));
-//			extractedTags.addAll(findRics(articles.get(key)));
-//			Set<String> extractedTags = (findRics(articles.get(key)));
+			extractedTags.addAll(findRics(articles.get(key)));
 			PrettyResult res = new PrettyResult(key,extractedTags,classDefinition.get(classified.get(key)),articles.get(key));
 			System.out.println(res);
 			results.add(res);
@@ -191,14 +194,10 @@ public class ResolveClassificationModule extends ModuleImpl {
 	
 	private Set<String> findRics(String text){
 		Set<String> rics = new TreeSet<String>();
-		// Tokenize
-		FeatureUnitTokenizer tokenizer = new FeatureUnitTokenizer();
-		List<String> tokens = tokenizer.tokenize(text);
-		// match
-		for(String ric : coveredRics){
-			if(tokens.contains(ric)){
-				rics.add(ric);
-			}
+		
+		Matcher matcher = ricPattern.matcher(text);
+		while(matcher.find()){
+			rics.add(matcher.group().trim());
 		}
 		return rics;
 	}

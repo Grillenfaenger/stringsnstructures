@@ -30,6 +30,7 @@ import modules.OutputPort;
 
 
 
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.google.gson.Gson;
@@ -38,6 +39,7 @@ import com.google.gson.reflect.TypeToken;
 
 import common.parallelization.CallbackReceiver;
 import de.uni_koeln.spinfo.classification.core.data.ClassifyUnit;
+import de.uni_koeln.spinfo.classification.core.data.FeatureUnitConfiguration;
 import de.uni_koeln.spinfo.classification.zoneAnalysis.data.ZoneClassifyUnit;
 import de.uni_koeln.spinfo.stocknews.articles.data.Article;
 import de.uni_koeln.spinfo.stocknews.classification.workflow.WekaClassifier;
