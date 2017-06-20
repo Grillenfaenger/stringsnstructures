@@ -157,8 +157,6 @@ public class ResolveClassificationModule extends ModuleImpl {
 			System.out.println(res);
 			results.add(res);
 		}
-		
-		System.out.println(results.get(6297));
 		final String jsonOut = gson.toJson(results, OUTPUT_TYPE);
 		this.getOutputPorts().get(ID_OUTPUT).outputToAllCharPipes(jsonOut);
 		
