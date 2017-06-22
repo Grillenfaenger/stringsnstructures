@@ -58,7 +58,7 @@ public class ReutersNewsXLSInputModule extends ModuleImpl {
 		
 		// Add property defaults (_should_ be provided for every property)
 		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Reuters News XLS Input Module");
-		this.getPropertyDefaultValues().put(PROPERTYKEY_XLSINPUT, "C:/Users/avogt/git/SNC/StockNewsClassification/input/News_filtered_DE_1.1.xls");
+		this.getPropertyDefaultValues().put(PROPERTYKEY_XLSINPUT, "/Strings/src/test/resources/News_filtered_DE_1.1.xls");
 
 		
 		// Define I/O

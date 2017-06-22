@@ -80,7 +80,7 @@ public class ResolveClassificationModule extends ModuleImpl {
 
 		
 		// Add property defaults (_should_ be provided for every property)
-		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATA, "C:/Users/avogt/git/SNC/StockNewsClassification/output/classification/trainingDataTEST2.json");
+		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATA, "/Strings/src/test/resources/trainingData.json");
 
 		
 		// Define I/O

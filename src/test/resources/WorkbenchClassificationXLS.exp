@@ -1,108 +1,108 @@
 [
   {
     "properties": {
-      "name": "Reuters News XLS Input Module",
-      "path to xls file": "src\\test\\resources\\News_filtered_DE_1.1.xls"
+      "name": "Weka Classifier Wrapper Module",
+      "trainingdatafile": "src/test/resources/trainingData.json",
+      "method": "NB"
     },
-    "moduleInstanceHashCode": 182985373,
-    "moduleCanonicalClassName": "modules.weka_classifier.ReutersNewsXLSInputModule",
-    "serializableInputPortList": {},
-    "serializableOutputPortList": {
-      "output": {
-        "instanceHashCode": 42770192,
-        "name": "output",
+    "moduleInstanceHashCode": 888389963,
+    "moduleCanonicalClassName": "modules.weka_classifier.WekaClassifierWrapperModule",
+    "serializableInputPortList": {
+      "bag of words": {
+        "instanceHashCode": 1202070091,
+        "name": "bag of words",
+        "connectedPipesDestinationHashCodes": {}
+      },
+      "text": {
+        "instanceHashCode": 992284558,
+        "name": "text",
+        "connectedPipesDestinationHashCodes": {}
+      },
+      "xls": {
+        "instanceHashCode": 693880600,
+        "name": "xls",
         "connectedPipesDestinationHashCodes": {
-          "1550139548": "modules.CharPipe",
-          "1796927575": "modules.CharPipe"
+          "1070172405": "modules.CharPipe"
+        }
+      }
+    },
+    "serializableOutputPortList": {
+      "json": {
+        "instanceHashCode": 1225478461,
+        "name": "json",
+        "connectedPipesDestinationHashCodes": {
+          "1522626285": "modules.CharPipe"
         }
       }
     },
     "metadata": {
-      "ypos": 18,
-      "xpos": 29
+      "ypos": 54,
+      "xpos": 255
     }
   },
   {
     "properties": {
-      "name": "Weka Classifier Wrapper Module",
-      "trainingdatafile": "src\\test\\resources\\trainingData.json",
-      "method": "NaiveBayes"
+      "name": "Reuters News XLS Input Module",
+      "path to xls file": "src/test/resources/News_filtered_DE_1.1.xls"
     },
-    "moduleInstanceHashCode": 60729411,
-    "moduleCanonicalClassName": "modules.weka_classifier.WekaClassifierWrapperModule",
-    "serializableInputPortList": {
-      "article objects in json": {
-        "instanceHashCode": 1550139548,
-        "name": "article objects in json",
-        "connectedPipesDestinationHashCodes": {
-          "42770192": "modules.CharPipe"
-        }
-      },
-      "json": {
-        "instanceHashCode": 764854606,
-        "name": "json",
-        "connectedPipesDestinationHashCodes": {}
-      },
-      "text": {
-        "instanceHashCode": 1258598387,
-        "name": "text",
-        "connectedPipesDestinationHashCodes": {}
-      }
-    },
+    "moduleInstanceHashCode": 205164256,
+    "moduleCanonicalClassName": "modules.weka_classifier.ReutersNewsXLSInputModule",
+    "serializableInputPortList": {},
     "serializableOutputPortList": {
-      "json": {
-        "instanceHashCode": 2007000716,
-        "name": "json",
+      "output": {
+        "instanceHashCode": 1070172405,
+        "name": "output",
         "connectedPipesDestinationHashCodes": {
-          "28817732": "modules.CharPipe"
+          "693880600": "modules.CharPipe",
+          "768934314": "modules.CharPipe"
         }
       }
     },
     "metadata": {
-      "ypos": 83,
-      "xpos": 256
+      "ypos": 35,
+      "xpos": 28
     }
   },
   {
     "properties": {
       "name": "Resolve Classification Module",
-      "training data": "src\\test\\resources\\trainingData.json"
+      "training data": "src/test/resources/trainingData.json"
     },
-    "moduleInstanceHashCode": 871803289,
+    "moduleInstanceHashCode": 1671089546,
     "moduleCanonicalClassName": "modules.weka_classifier.ResolveClassificationModule",
     "serializableInputPortList": {
       "Result of WekaClassifier Wrapper module": {
-        "instanceHashCode": 28817732,
+        "instanceHashCode": 1522626285,
         "name": "Result of WekaClassifier Wrapper module",
         "connectedPipesDestinationHashCodes": {
-          "2007000716": "modules.CharPipe"
+          "1225478461": "modules.CharPipe"
         }
       },
       "text input": {
-        "instanceHashCode": 447775885,
+        "instanceHashCode": 1588112069,
         "name": "text input",
         "connectedPipesDestinationHashCodes": {}
       },
       "articles": {
-        "instanceHashCode": 1796927575,
+        "instanceHashCode": 768934314,
         "name": "articles",
         "connectedPipesDestinationHashCodes": {
-          "42770192": "modules.CharPipe"
+          "1070172405": "modules.CharPipe"
         }
       }
     },
     "serializableOutputPortList": {
       "output": {
-        "instanceHashCode": 1948633887,
+        "instanceHashCode": 1304005268,
         "name": "output",
         "connectedPipesDestinationHashCodes": {
-          "4540177": "modules.CharPipe"
+          "475935688": "modules.CharPipe"
         }
       }
     },
     "metadata": {
-      "ypos": 236,
-      "xpos": 381
+      "ypos": 220,
+      "xpos": 293
     }
   },
   {
@@ -113,21 +113,21 @@
       "Encoding": "UTF-8",
       "Use GZIP": "false"
     },
-    "moduleInstanceHashCode": 44727949,
+    "moduleInstanceHashCode": 1509141062,
     "moduleCanonicalClassName": "modules.input_output.FileWriterModule",
     "serializableInputPortList": {
       "input": {
-        "instanceHashCode": 4540177,
+        "instanceHashCode": 475935688,
         "name": "input",
         "connectedPipesDestinationHashCodes": {
-          "1948633887": "modules.CharPipe"
+          "1304005268": "modules.CharPipe"
         }
       }
     },
     "serializableOutputPortList": {},
     "metadata": {
-      "ypos": 289,
-      "xpos": 84
+      "ypos": 343,
+      "xpos": 271
     }
   }
 ]

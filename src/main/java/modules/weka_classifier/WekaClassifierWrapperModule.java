@@ -54,10 +54,10 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 
 	// Strings identifying/describing in- and output pipes
 	
-	private final static String INPUT_ID = "json";
-	private final static String INPUT_DESC = "[text/json] TreeMap<Integer,TreeMap<String,Integer>>";
-	private final static String INPUT_ARTICLES_ID = "article objects in json";
-	private final static String INPUT_ARTICLES_DESC = "[text/json] List<Article>";
+	private final static String INPUT_BOW_ID = "bag of words";
+	private final static String INPUT_BOW_DESC = "[text/json] TreeMap<Integer,TreeMap<String,Integer>>";
+	private final static String INPUT_ARTICLES_ID = "xls";
+	private final static String INPUT_ARTICLES_DESC = "[text/json] Article texts from xls reader";
 	private final static String INPUT_TEXT_ID = "text";
 	private final static String INPUT_TEXT_DESC = "[text/plain] A newline separated List of texts.";
 	private final static String OUTPUT_ID = "json";
@@ -90,24 +90,24 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 		super(callbackReceiver, properties);
 		
 		// Add description
-		this.setDescription("Regular expression text replacement module. Can use escape characters (e.g. '\\n') and backreferences (marked with '$', e.g. '$1').");
+		this.setDescription("Weka Classifier Wrapper Module. Classifies input texts respective to training data and classifier methods (u.a. Weka Classifiers)");
 
 		// Add property descriptions (obligatory for every property!)
-		this.getPropertyDescriptions().put(CLASSIFIERMETHOD, "KNNClassifier, RocchioClassifier or BayesClassifier(default)");
+		this.getPropertyDescriptions().put(CLASSIFIERMETHOD, "NB (Naive Bayes, default), KNN, R (Rocchio) or SVM (Support Vector Machine");
 		this.getPropertyDescriptions().put(PROPERTYKEY_TRAININGDATAFILE, "Path to classified articles to train classifier");
 		
 		// Add property defaults (_should_ be provided for every property)
 		this.getPropertyDefaultValues().put(ModuleImpl.PROPERTYKEY_NAME, "Weka Classifier Wrapper Module"); // Property key for module name is defined in parent class
-		this.getPropertyDefaultValues().put(CLASSIFIERMETHOD, "NaiveBayes");
-		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATAFILE, "/StockNewsClassification/output/classification/trainingData.txt");
+		this.getPropertyDefaultValues().put(CLASSIFIERMETHOD, "NB");
+		this.getPropertyDefaultValues().put(PROPERTYKEY_TRAININGDATAFILE, "/Strings/src/test/resources/trainingData.json");
 	
 		
 		// Define I/O
 		InputPort textPort = new InputPort(INPUT_TEXT_ID, "newline seperated texts.", this);
 		textPort.addSupportedPipe(CharPipe.class);
-		InputPort bowPort = new InputPort(INPUT_ID, "bag of words input.", this);
+		InputPort bowPort = new InputPort(INPUT_BOW_ID, "bag of words input.", this);
 		bowPort.addSupportedPipe(CharPipe.class);
-		InputPort articlePort = new InputPort(INPUT_ARTICLES_ID, "json article objects.", this);
+		InputPort articlePort = new InputPort(INPUT_ARTICLES_ID, "Article texts from xls reader.", this);
 		articlePort.addSupportedPipe(CharPipe.class);
 		OutputPort outputPort = new OutputPort(OUTPUT_SIMPLE_ID, "Plain text character output.", this);
 		outputPort.addSupportedPipe(CharPipe.class);
@@ -129,7 +129,7 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 		final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		final InputPort textPort = this.getInputPorts().get(INPUT_TEXT_ID);
-		final InputPort bowPort = this.getInputPorts().get(INPUT_ID);
+		final InputPort bowPort = this.getInputPorts().get(INPUT_BOW_ID);
 		final InputPort articlePort = this.getInputPorts().get(INPUT_ARTICLES_ID);
 		
 		// the output: an empty result map mapping sentence Nrs to a map holding
@@ -157,7 +157,7 @@ public class WekaClassifierWrapperModule extends ModuleImpl {
 			result.putAll(resultH);
 			
 		} else if (bowPort.isConnected()) {
-			final String bow_input = this.readStringFromInputPort(this.getInputPorts().get(INPUT_ID));
+			final String bow_input = this.readStringFromInputPort(this.getInputPorts().get(INPUT_BOW_ID));
 			final TreeMap<Integer, Map<String, Integer>> sentenceNrsToBagOfWords = gson.fromJson(bow_input, INPUT_TYPE);
 
 			// make sure that the bags of words are ready to use
