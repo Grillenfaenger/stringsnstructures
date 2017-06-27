@@ -1,0 +1,176 @@
+[
+  {
+    "properties": {
+      "name": "Weka Classifier Wrapper Module",
+      "trainingdatafile": "src/test/resources/trainingData.json",
+      "method": "NB"
+    },
+    "moduleInstanceHashCode": 2119768546,
+    "moduleCanonicalClassName": "modules.weka_classifier.WekaClassifierWrapperModule",
+    "serializableInputPortList": {
+      "bag of words": {
+        "instanceHashCode": 565882865,
+        "name": "bag of words",
+        "connectedPipesDestinationHashCodes": {
+          "1347710757": "modules.CharPipe"
+        }
+      },
+      "text": {
+        "instanceHashCode": 883594570,
+        "name": "text",
+        "connectedPipesDestinationHashCodes": {}
+      },
+      "xls": {
+        "instanceHashCode": 1352700862,
+        "name": "xls",
+        "connectedPipesDestinationHashCodes": {}
+      }
+    },
+    "serializableOutputPortList": {
+      "json": {
+        "instanceHashCode": 613514108,
+        "name": "json",
+        "connectedPipesDestinationHashCodes": {
+          "1473185164": "modules.CharPipe"
+        }
+      }
+    },
+    "metadata": {
+      "ypos": 54,
+      "xpos": 255
+    }
+  },
+  {
+    "properties": {
+      "name": "Resolve Classification Module",
+      "training data": "src/test/resources/trainingData.json"
+    },
+    "moduleInstanceHashCode": 1309190628,
+    "moduleCanonicalClassName": "modules.weka_classifier.ResolveClassificationModule",
+    "serializableInputPortList": {
+      "Result of WekaClassifier Wrapper module": {
+        "instanceHashCode": 1473185164,
+        "name": "Result of WekaClassifier Wrapper module",
+        "connectedPipesDestinationHashCodes": {
+          "613514108": "modules.CharPipe"
+        }
+      },
+      "text input": {
+        "instanceHashCode": 934271738,
+        "name": "text input",
+        "connectedPipesDestinationHashCodes": {
+          "1673958098": "modules.CharPipe"
+        }
+      },
+      "articles": {
+        "instanceHashCode": 1285775181,
+        "name": "articles",
+        "connectedPipesDestinationHashCodes": {}
+      }
+    },
+    "serializableOutputPortList": {
+      "output": {
+        "instanceHashCode": 1676656688,
+        "name": "output",
+        "connectedPipesDestinationHashCodes": {
+          "710852285": "modules.CharPipe"
+        }
+      }
+    },
+    "metadata": {
+      "ypos": 220,
+      "xpos": 293
+    }
+  },
+  {
+    "properties": {
+      "outputfile": "C:\\Users\\avogt\\output.txt",
+      "Buffer length": "8192",
+      "name": "File Writer",
+      "Encoding": "UTF-8",
+      "Use GZIP": "false"
+    },
+    "moduleInstanceHashCode": 437928199,
+    "moduleCanonicalClassName": "modules.input_output.FileWriterModule",
+    "serializableInputPortList": {
+      "input": {
+        "instanceHashCode": 710852285,
+        "name": "input",
+        "connectedPipesDestinationHashCodes": {
+          "1676656688": "modules.CharPipe"
+        }
+      }
+    },
+    "serializableOutputPortList": {},
+    "metadata": {
+      "ypos": 343,
+      "xpos": 271
+    }
+  },
+  {
+    "properties": {
+      "Buffer length": "8192",
+      "name": "File Reader",
+      "Encoding": "UTF-8",
+      "inputfile": "/Users/andreas/git/stringsnstructures/src/test/resources/articles.txt",
+      "Use GZIP": "false",
+      "Normalize Unicode": "true"
+    },
+    "moduleInstanceHashCode": 1212196908,
+    "moduleCanonicalClassName": "modules.input_output.FileReaderModule",
+    "serializableInputPortList": {},
+    "serializableOutputPortList": {
+      "output": {
+        "instanceHashCode": 1673958098,
+        "name": "output",
+        "connectedPipesDestinationHashCodes": {
+          "934271738": "modules.CharPipe",
+          "2111437094": "modules.CharPipe"
+        }
+      }
+    },
+    "metadata": {
+      "ypos": 27,
+      "xpos": 13
+    }
+  },
+  {
+    "properties": {
+      "name": "BagsOfWords"
+    },
+    "moduleInstanceHashCode": 592155640,
+    "moduleCanonicalClassName": "modules.bag_of_words.BagsOfWordsModule",
+    "serializableInputPortList": {
+      "GST": {
+        "instanceHashCode": 727095527,
+        "name": "GST",
+        "connectedPipesDestinationHashCodes": {}
+      },
+      "Simple labels": {
+        "instanceHashCode": 916792317,
+        "name": "Simple labels",
+        "connectedPipesDestinationHashCodes": {}
+      },
+      "Simple": {
+        "instanceHashCode": 2111437094,
+        "name": "Simple",
+        "connectedPipesDestinationHashCodes": {
+          "1673958098": "modules.CharPipe"
+        }
+      }
+    },
+    "serializableOutputPortList": {
+      "BoW": {
+        "instanceHashCode": 1347710757,
+        "name": "BoW",
+        "connectedPipesDestinationHashCodes": {
+          "565882865": "modules.CharPipe"
+        }
+      }
+    },
+    "metadata": {
+      "ypos": 149,
+      "xpos": 49
+    }
+  }
+]

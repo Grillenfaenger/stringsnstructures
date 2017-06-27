@@ -5,39 +5,39 @@
       "trainingdatafile": "src/test/resources/trainingData.json",
       "method": "NB"
     },
-    "moduleInstanceHashCode": 41847776,
+    "moduleInstanceHashCode": 1192051224,
     "moduleCanonicalClassName": "modules.weka_classifier.WekaClassifierWrapperModule",
     "serializableInputPortList": {
       "bag of words": {
-        "instanceHashCode": 1578341182,
+        "instanceHashCode": 666322419,
         "name": "bag of words",
         "connectedPipesDestinationHashCodes": {}
       },
       "text": {
-        "instanceHashCode": 1081625623,
+        "instanceHashCode": 1012824344,
         "name": "text",
-        "connectedPipesDestinationHashCodes": {}
+        "connectedPipesDestinationHashCodes": {
+          "1368892880": "modules.CharPipe"
+        }
       },
       "xls": {
-        "instanceHashCode": 1684186899,
+        "instanceHashCode": 159202099,
         "name": "xls",
-        "connectedPipesDestinationHashCodes": {
-          "1995698937": "modules.CharPipe"
-        }
+        "connectedPipesDestinationHashCodes": {}
       }
     },
     "serializableOutputPortList": {
       "json": {
-        "instanceHashCode": 876287354,
+        "instanceHashCode": 343441202,
         "name": "json",
         "connectedPipesDestinationHashCodes": {
-          "916586270": "modules.CharPipe"
+          "1537294876": "modules.CharPipe"
         }
       }
     },
     "metadata": {
-      "ypos": 58,
-      "xpos": 360
+      "ypos": 54,
+      "xpos": 255
     }
   },
   {
@@ -45,41 +45,41 @@
       "name": "Resolve Classification Module",
       "training data": "src/test/resources/trainingData.json"
     },
-    "moduleInstanceHashCode": 779942235,
+    "moduleInstanceHashCode": 1880212580,
     "moduleCanonicalClassName": "modules.weka_classifier.ResolveClassificationModule",
     "serializableInputPortList": {
       "Result of WekaClassifier Wrapper module": {
-        "instanceHashCode": 916586270,
+        "instanceHashCode": 1537294876,
         "name": "Result of WekaClassifier Wrapper module",
         "connectedPipesDestinationHashCodes": {
-          "876287354": "modules.CharPipe"
+          "343441202": "modules.CharPipe"
         }
       },
       "text input": {
-        "instanceHashCode": 1200262374,
+        "instanceHashCode": 930399645,
         "name": "text input",
-        "connectedPipesDestinationHashCodes": {}
+        "connectedPipesDestinationHashCodes": {
+          "1368892880": "modules.CharPipe"
+        }
       },
       "articles": {
-        "instanceHashCode": 772262612,
+        "instanceHashCode": 1462818019,
         "name": "articles",
-        "connectedPipesDestinationHashCodes": {
-          "1995698937": "modules.CharPipe"
-        }
+        "connectedPipesDestinationHashCodes": {}
       }
     },
     "serializableOutputPortList": {
       "output": {
-        "instanceHashCode": 1115396779,
+        "instanceHashCode": 15118552,
         "name": "output",
         "connectedPipesDestinationHashCodes": {
-          "2073810165": "modules.CharPipe"
+          "1367778170": "modules.CharPipe"
         }
       }
     },
     "metadata": {
-      "ypos": 320,
-      "xpos": 389
+      "ypos": 220,
+      "xpos": 293
     }
   },
   {
@@ -90,44 +90,45 @@
       "Encoding": "UTF-8",
       "Use GZIP": "false"
     },
-    "moduleInstanceHashCode": 1378899134,
+    "moduleInstanceHashCode": 1840952098,
     "moduleCanonicalClassName": "modules.input_output.FileWriterModule",
     "serializableInputPortList": {
       "input": {
-        "instanceHashCode": 2073810165,
+        "instanceHashCode": 1367778170,
         "name": "input",
         "connectedPipesDestinationHashCodes": {
-          "1115396779": "modules.CharPipe"
+          "15118552": "modules.CharPipe"
         }
       }
     },
     "serializableOutputPortList": {},
     "metadata": {
-      "ypos": 244,
-      "xpos": 651
+      "ypos": 343,
+      "xpos": 271
     }
   },
   {
     "properties": {
-      "name": "Reuters News XLS Input Module",
-      "path to xls file": "src/test/resources/News_filtered_DE_1.1.xls"
+      "Buffer length": "8192",
+      "name": "File Reader",
+      "inputfile": "/Users/andreas/git/stringsnstructures/src/test/resources/articles.txt",
+      "Encoding": "UTF-8",
+      "Normalize Unicode": "true",
+      "Use GZIP": "false"
     },
-    "moduleInstanceHashCode": 103043250,
-    "moduleCanonicalClassName": "modules.weka_classifier.ReutersNewsXLSInputModule",
+    "moduleInstanceHashCode": 887480265,
+    "moduleCanonicalClassName": "modules.input_output.FileReaderModule",
     "serializableInputPortList": {},
     "serializableOutputPortList": {
       "output": {
-        "instanceHashCode": 1995698937,
+        "instanceHashCode": 1368892880,
         "name": "output",
         "connectedPipesDestinationHashCodes": {
-          "1684186899": "modules.CharPipe",
-          "772262612": "modules.CharPipe"
+          "1012824344": "modules.CharPipe",
+          "930399645": "modules.CharPipe"
         }
       }
     },
-    "metadata": {
-      "ypos": 111,
-      "xpos": 96
-    }
+    "metadata": {}
   }
 ]
